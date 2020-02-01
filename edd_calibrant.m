@@ -1,13 +1,15 @@
 function edd_calibrant(varargin)
 % GUI to calibrate detector
 %
+%   + 1.0.2 2020/01/31
+%           - [bug fix]send proper scan number to "edd_cali_TOA"
 %   + 1.0.1 2019/10/23
 %           - Energy calibration can do individual step
 %   + 1.0   2017/11/03
 %           - initial version
 %
-% Copyright 2017 Andrew Chuang (chuang.cp@gmail.com)
-% $Revision: 1.0.1 $  $Date: 2019/10/23 $
+% Copyright 2017-2020 Andrew Chuang (chuang.cp@gmail.com)
+% $Revision: 1.0.2 $  $Date: 2020/01/31 $
 
 % choice = questdlg('Which detector do you want to calibrate?', ...
 %     'Choose Detector', ...
@@ -51,8 +53,7 @@ switch choice
             warndlg({'Please read the data first!!'});
             return;
         end
-        opt.data = h.data.data;
-        %h.config.visopt
+        opt.data = h.data(h.config.visopt.scno).data;
         %opt.Inst(1).par = [h.config.visopt.Inst(1).TOA 0 h.config.visopt.Inst(1).Ch2E];
         %opt.Inst(2).par = [h.config.visopt.Inst(2).TOA 0 h.config.visopt.Inst(2).Ch2E];
         opt.detpar = h.config.visopt.Inst.detpar;
@@ -61,7 +62,7 @@ switch choice
         opt.posno = h.config.visopt.posno;
         opt.mat = 1;
         opt.exp_time = h.data.exp_time;
-        
+
         edd_cali_TOA(opt);
     case 'None'
         disp('Okay!! Bye....')
