@@ -14,7 +14,9 @@ function edd_cali_energy(varargin)
 % Copyright 2017-2019 Andrew Chuang
 % $Revision: 1.1.1 $  $Date: 2019/10/23 $
 
+% Check if the panel exist or not
 heddparMain = findall(0,'Tag','eddcaliEnergymain_Fig');
+
 if isempty(heddparMain)
     if nargin == 1
         opt = varargin{1};
@@ -22,8 +24,9 @@ if isempty(heddparMain)
         opt.source = 1;
         opt.detno  = 1;
         opt.posno  = 1;
+        opt.detpar = [0 0.026 0];
     end
-        
+    opt.detpar = [0 0.0264 0];   
     % default options
     opt.table_selection = [];
     if ~isfield(opt,'detno')
@@ -32,23 +35,26 @@ if isempty(heddparMain)
     % co-57 (in keV)  http://www.spectrumtechniques.com/products/sources/cobalt-57/
     opt.emission(1).name    = 'Co-57'; 
     opt.emission(1).energy  = [136.47356 122.06065 14.41295 7.058 (6.40384*33.2+6.39084*16.8)/50]; 
-    opt.emission(1).channel = [3925 3508 416 203 184];
-    opt.emission(1).width   = [  20   20  10  10  10];
+    %opt.emission(1).channel = [3925 3508 416 203 184];
+    opt.emission(1).channel = (opt.emission(1).energy-opt.detpar(1))/opt.detpar(2);
+    opt.emission(1).width   = [  33   30  10  10  10];
     opt.emission(1).int     = [ 0.1    1 0.3 0.02 0.08];
     opt.emission(1).default = [true true true false false];
+
     % cd-109 (in keV)  http://www.spectrumtechniques.com/products/sources/cadmium-109/
-    
     opt.emission(2).name    = 'Cd-109'; 
     %opt.emission(2).energy  = [88.033610 (25.512 25.4567) (25.146 24.9427 24.9118) (22.16317 21.9906)]; 
     opt.emission(2).energy  = [88.033610 25.4664 24.9332 22.1031];    % [gamma kb2 kb1 ka]
-    opt.emission(2).channel = [2530 732 718 636];
+    %opt.emission(2).channel = [2530 732 718 636];
+    opt.emission(2).channel = (opt.emission(2).energy-opt.detpar(1))/opt.detpar(2);
     opt.emission(2).width   = [18 10 10 10];
     opt.emission(2).int     = [0.035 0.04 0.2 1];
     opt.emission(2).default = [true true true true];
     
     opt.emission(3).name    = 'dual_57/109'; 
     opt.emission(3).energy  = [136.47356 122.06065 88.033610 25.4664 24.9332 22.1031 14.41295 7.058 6.3995];    % [gamma_Co gamma_Co gamma_Cd kb2 kb1 ka]
-    opt.emission(3).channel = [3925 3508 2530 732 718 636 416 203 184];
+    %opt.emission(3).channel = [3925 3508 2530 732 718 636 416 203 184];
+    opt.emission(3).channel = (opt.emission(3).energy-opt.detpar(1))/opt.detpar(2);
     opt.emission(3).width   = [27 24 17 8 10 10 9 7 8];
     opt.emission(3).int     = [0.01 0.1 0.025 0.025 0.15 0.7 0.03 0.005 0.008];
     opt.emission(3).default = [true true true true true true false true true];
@@ -303,6 +309,7 @@ htablepar(2) = uitable('Parent',heddsetparmain,...
     'Data',data2,...
     'Fontsize',13,...
     'RowName',[],...
+    'CellSelectionCallback',@uitable2_selection_Callback,...
     'Tag','en2ch_table');
 
 
@@ -551,13 +558,18 @@ switch hObject.Value
 end
 
 
-
 %%%% call back to report selection
 function uitable_selection_Callback(~,eventdata)
     h = get_handle; 
     h.opt.table_selection = eventdata.Indices;
     update_handle(h);
 
+function uitable2_selection_Callback(~,eventdata)
+    h = get_handle;
+    fprintf('select %d\n',eventdata.Indices);
+    %h.opt.table_selection = eventdata.Indices;
+    update_handle(h);
+    
 
 %==========================================================================
 % --- close request function of eddgetparmain fig 

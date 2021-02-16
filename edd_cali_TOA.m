@@ -19,8 +19,7 @@ if isempty(heddparMain)
         opt.detno = 1;
         %opt.Inst(1).par = [5 0 0.3 0];
         %opt.Inst(2).par = [5 0 0.3 0];
-        opt.detpar = [5 0 0.3 0;...
-                      5 0 0.3 0];
+        opt.detpar = repmat([5 0 0.3 0],10,1);
     end
         
     % default options
@@ -120,7 +119,8 @@ hpop(1) = uicontrol('Style','PopupMenu',...
     'Position',[10 row1 70 23],...
     'backgroundcolor',[1 1 1],...
     'fontsize',10,...
-    'String',{'Det-1','Det-2'},...
+    'String',{'Det-1','Det-2','Det-3','Det-4','Det-5',...
+              'Det-6','Det-7','Det-8','Det-9','Det-10'},...
     'Value',1,...
     'HorizontalAlignment','left',...
     'callback',@main_select_det_Callback,...
@@ -456,16 +456,16 @@ detno = h.main_pop_detno.Value;
 hroot = findall(0,'Tag','eddviewmain_Fig');
 hroot = getappdata(hroot,'allhandle');
 switch detno
-    case 1
+    case {1,2,3,4,5,6,7,8,9,10}
         %hroot.expinfo_edit_toa1.String = num2str(det_TOA,'%1.8f');
         %hroot.config.visopt.Inst(1).TOA = det_TOA;
-        hroot.config.visopt.Inst.detpar(1,1) = det_TOA;
-        hroot.expinfo_table_detpar.Data{1,1} = det_TOA;
-    case 2
-        %hroot.expinfo_edit_toa2.String = num2str(det_TOA,'%1.8f');
-        %hroot.config.visopt.Inst(2).TOA = det_TOA;
-        hroot.config.visopt.Inst.detpar(2,1) = det_TOA;
-        hroot.expinfo_table_detpar.Data{2,1} = det_TOA;
+        hroot.config.visopt.Inst.detpar(detno,1) = det_TOA;
+        hroot.expinfo_table_detpar.Data{detno,1} = det_TOA;
+%     case 2
+%         %hroot.expinfo_edit_toa2.String = num2str(det_TOA,'%1.8f');
+%         %hroot.config.visopt.Inst(2).TOA = det_TOA;
+%         hroot.config.visopt.Inst.detpar(2,1) = det_TOA;
+%         hroot.expinfo_table_detpar.Data{2,1} = det_TOA;
     otherwise
         warndlg('Not supportted yet!!')
 end

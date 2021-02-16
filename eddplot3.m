@@ -1,5 +1,6 @@
 % eddplot to visdualize 6BM data.
 %
+%   +1.6 2020/07/26 support plotting of all 10 elements
 %   +1.5 2020/01/16 support different size (for 10-element detector)
 %   +1.4 2018/11/27 new detpart format
 %   +1.3 2018/04/17 add x scaling factor
@@ -7,7 +8,7 @@
 %   +1.1 2017/09/20 bug fix
 %
 % Copyright 2017-2020 Andrew Chuang (chuang.cp@gmail.com)
-% $Revision: 1.5 $  $Date: 2020/01/16 $
+% $Revision: 1.6 $  $Date: 2020/07/26 $
 
 function eddplot3(da,opt)
 
@@ -136,7 +137,8 @@ else
 end
 
 if isfield(opt,'scno')
-    scno = opt.scno(1);   % only plot one scan at a time. (May.17)
+    %scno = opt.scno(1);   % only plot one scan at a time. (May.17)
+    scno = opt.scno; 
 else
     scno = 1;
 end
@@ -165,92 +167,61 @@ elseif ~isfield(da(scno),'Inst')
     fprintf('No Instrument parameters provided!!\n');
     fprintf('Use default TOA  = 3 (deg)\n');
     fprintf('Use default Ch2E = [0 0.03 0];\n');
-    da(scno).Inst.detpar = [3 0 0.03 0;...
-                            3 0 0.03 0];
+    da(scno).Inst.detpar = repmat([3 0 0.03 0],10,1);
 end
 
 % calculate E_grid, d_grid
 hc = 12.398419057638671;
-for i = 1:2
-    da(scno).Inst.E_grid(i,:) = polyval(flip(da(1).Inst.detpar(i,2:end)), 1:size(da(scno).data{detno},2));
-    da(scno).Inst.d_grid(i,:) = hc./da(scno).Inst.E_grid(i,:)*0.5/sind(da(1).Inst.detpar(i,1)/2);
+for i = 1:size(da(1).Inst.detpar,1)
+    for j = 1:length(scno)
+        da(scno(j)).Inst.E_grid(i,:) = polyval(flip(da(1).Inst.detpar(i,2:end)), 1:size(da(scno(j)).data{detno},2));
+        da(scno(j)).Inst.d_grid(i,:) = hc./da(scno(j)).Inst.E_grid(i,:)*0.5/sind(da(1).Inst.detpar(i,1)/2);
+    end
 end
 
-%%%% initiate figure for step plot
-if strcmpi(type,'step_plot')
-    hfig = findall(0,'Tag','edd_fig_step_plot');
-    if ishandle(hfig)
-        fig = hfig(1);
-        clf(fig,'reset')
-        set(fig,'Tag','edd_fig_step_plot');
-    else
-        fig = figure(163);
-        set(fig,'Position',[900 100 800 600],'Tag','edd_fig_step_plot');
-    end
-    figure(163);
-else
-    
-    
-    %%%%%% switch between detectors
-    switch detno
-        case 1
-            if strcmp(type,'2draw')
-                hfig = findall(0,'Tag','edd_fig_det1_map');
-                if ishandle(hfig)
-                    fig = hfig(1);
-                    clf(fig,'reset');
-                    set(fig,'Tag','edd_fig_det1_map');
-                else
-                    fig = figure(161);
-                    set(fig,'Position',[50 100 800 600],'Tag','edd_fig_det1_map');
-                end
-                figure(161);
-            else
-                hfig = findall(0,'Tag','edd_fig_det1_line');
-                if ishandle(hfig)
-                    fig = hfig(1);
-                    clf(fig,'reset');
-                    set(fig,'Tag','edd_fig_det1_line');
-                else
-                    fig = figure(162);
-                    set(fig,'Position',[50 700 800 600],'Tag','edd_fig_det1_line');
-                end
-                figure(162);
-            end
-        case 2
-            if strcmp(type,'2draw')
-                hfig = findall(0,'Tag','edd_fig_det2_map');
-                if ishandle(hfig)
-                    fig = hfig(1);
-                    clf(fig,'reset');
-                    set(fig,'Tag','edd_fig_det2_map');
-                else
-                    fig = figure(261);
-                    set(fig,'Position',[100 100 800 600],'Tag','edd_fig_det2_map');
-                end
-                figure(261);
-            else
-                hfig = findall(0,'Tag','edd_fig_det2_line');
-                if ishandle(hfig)
-                    fig = hfig(1);
-                    clf(fig,'reset');
-                    set(fig,'Tag','edd_fig_det2_line');
-                else
-                    fig = figure(262);
-                    set(fig,'Position',[100 700 800 600],'Tag','edd_fig_det2_line');
-                end
-                figure(262);
-            end
-            %         for i = 1:length(da)
-            %             da(i).data = da(i).data2;
-            %         end
-            
-            %da(scno).data = cat(3,da(scno).data,da(scno).data2);
-        otherwise
-            fprintf('3 or more detector config is not supported yet!!\n');
-            return;
-    end
+%%%% initiate figure for various types of plot
+switch lower(type)
+    case 'step_plot'
+        hfig = findall(0,'Tag','edd_fig_step_plot');
+        if ishandle(hfig)
+            fig = hfig(1);
+            clf(fig,'reset');
+            set(fig,'Tag','edd_fig_step_plot');
+        else
+            fig = figure(163);
+            set(fig,'Position',[900 100 800 600],'Tag','edd_fig_step_plot');
+        end
+        figure(163);
+        
+    case '2draw'
+        figtag   = sprintf('edd_fit_det%d_map',detno(1));
+        fignum= detno(1)*100+61;
+        hfig = findall(0,'Tag',figtag);
+        if ishandle(hfig)
+            fig=hfig(1);
+            clf(fig,'reset');
+            set(fig,'Tag',figtag);
+        else
+            fig = figure(fignum);
+            set(fig,'Position',[50+(detno-1)*50 100 800 600],'Tag',figtag);
+        end
+        figure(fignum);
+        
+    otherwise
+        figtag   = sprintf('edd_fit_det%d_line',detno(1));
+        fig2num= detno*100+62;
+        hfig = findall(0,'Tag',figtag);
+        if ishandle(hfig)
+            fig = hfig(1);
+            clf(fig,'reset');
+            set(fig,'Tag',figtag);
+        else
+            fig = figure(fig2num);
+            set(fig,'Position',[50+(detno-1)*50 700 800 600],'Tag',figtag);
+        end
+        figure(fig2num)
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% start ploting
@@ -299,11 +270,28 @@ switch lower(type)
         leg = legend('toggle');
 
     case 'dspac'    % d-spacing was calculated during fitting
-        xdata = (da(scno).motorpos(x_range)+xoffset)*x_scaling;
+        if length(scno) > 1
+            xdata = [];
+            for i_scno=1:length(scno)
+                xdata = vertcat(xdata,(da(scno(i_scno)).motorpos(x_range)+xoffset)*x_scaling);
+            end
+        else
+            xdata = (da(scno).motorpos(x_range)+xoffset)*x_scaling;
+        end
+        %whos xdata
         fprintf('\nAveraged Peak Position (Mean%sStd) for %s\n',char(177),title_text);
         for i = 1:length(pk)
             %da(scno).fit(phase,pk(i),detno);
-            ydata = da(scno).fit(phase,pk(i),detno).dspac(x_range);
+            if length(scno)>1
+                ydata = [];
+                for i_scno = 1:length(scno)
+                    ydata = vertcat(ydata,da(scno(i_scno)).fit(phase,pk(i),detno).dspac(x_range));
+                end
+            else
+                ydata = da(scno).fit(phase,pk(i),detno).dspac(x_range);
+            end
+            %whos ydata
+
             flag  = find(ydata~=0);
             ydata = ydata(flag);
             if normalize == 1
@@ -330,7 +318,7 @@ switch lower(type)
         xlabel('Position (mm)');
         xlim(datalim{1});
         ylim(datalim{3});
-        title(title_text,'fontsize',fst);
+        title(strjoin(strsplit(title_text,'_'),'\\_'),'fontsize',fst);
         leg = legend('toggle');        
 
     case 'dspac2'     % calculate d-spacing based on tth value
@@ -367,7 +355,7 @@ switch lower(type)
         xlabel('Position (mm)');
         xlim(datalim{1});
         ylim(datalim{3});
-        title(title_text,'fontsize',fst);
+        title(strjoin(strsplit(title_text,'_'),'\\_'),'fontsize',fst);
         leg = legend('toggle');              
         
     case 'int'
@@ -553,7 +541,7 @@ switch lower(type)
         if ~strcmp(int_range,'auto'); set(gca,'clim',[log10(int_range(1)) log10(int_range(2))]);end
         xlabel(xlab,'fontsize',13);
         ylabel(ylab,'fontsize',13);
-        title(title_text,'fontsize',17);
+        title(strjoin(strsplit(title_text,'_'),'\\_'),'fontsize',17);
     case 'step_plot'
         title_text=sprintf('%s, %2.3f to %2.3f, %2.3f/step',da(scno).motorname, da(scno).motorpos(1), da(scno).motorpos(end), da(scno).motorstep);
         xrange = datalim{1};
@@ -575,6 +563,7 @@ switch lower(type)
         if sum(flag)==0
             flag = 1;
         end
+        %length(da(scno).data)
         if normalize
             yy1data = sum(da(scno).data{1}(:,flag),2)/max(sum(da(scno).data{1}(:,flag),2));
             yy2data = sum(da(scno).data{2}(:,flag),2)/max(sum(da(scno).data{2}(:,flag),2));
@@ -587,7 +576,7 @@ switch lower(type)
         line(xxdata,yy2data,'marker','o','color',cc(2,:),'Displayname','Det-2');
         xlabel(sprintf('%s position (mm)',da(scno).motorname),'fontsize',15);
         ylabel(sprintf('Sum Intensity'),'fontsize',15);
-        title(title_text,'fontsize',17);
+        title(strjoin(strsplit(title_text,'_'),'\\_'),'fontsize',17);
        
        
     otherwise

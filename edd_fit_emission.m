@@ -17,6 +17,11 @@ else
     return;
 end
 
+pk_id  = p0.pkid;
+pcen0  = p0.cen;
+pint0  = p0.int;
+pfwhm0 = p0.fwhm;
+
 if isfield(opt,'dup')
     dup = opt.dup;
 else
@@ -29,17 +34,12 @@ else
     ddown = repmat(50,1,length(pk_id));
 end
 
-pk_id  = p0.pkid;
-pcen0  = p0.cen;
-pint0  = p0.int;
-pfwhm0 = p0.fwhm;
-
 for i = 1:length(pk_id)
     npeaks = length(pcen0{i});
     [~, idx_min] = min(abs(xxdata-min(pcen0{i})));
     [~, idx_max] = min(abs(xxdata-max(pcen0{i})));
     %x_ind = round(min(pcen0{i}),0)-ddown(i):round(max(pcen0{i}),0)+dup(i);
-    x_ind = idx_min-ddown(i):idx_max+dup(i);
+    x_ind = max([idx_min-ddown(i) 1]):min([idx_max+dup(i) length(xxdata)]);
     xdata = xxdata(x_ind);
     ydata = yydata(x_ind);
     
