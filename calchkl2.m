@@ -11,7 +11,7 @@ if nargin ~= 2
 end
 hkl = []; Struc = upper(Struc); tp = 2*pi*sqrt(-1);
 
-if strcmp(Struc,'HCP')
+if strcmp(Struc,'HCP')||strcmp(Struc,'TET')
   for h = 0:floor(sqrt(s2max))
    More = 1; k = 0;
    while More
@@ -43,17 +43,17 @@ end
 
 
 switch Struc
-    case ('BCC')
+    case {'BCC','TET'}  % SG: 229
         R = [0 0 0; 1 1 1]'/2; b = [0 0 0]';
-    case('FCC')
+    case {'FCC'}   % SG: 225
         R = [0 0 0; 1 1 0; 1 0 1; 0 1 1]'/2; b = [0 0 0]';
-    case('DIA')
+    case('DIA')   % SG: 227
         R = [0 0 0; 1 1 0; 1 0 1; 0 1 1]'/2; b = [0 0 0; 1 1 1]'/4;
-    case('AL2O3')
+    case('AL2O3') % SG: 167
         R = [0 0 0; 1 -sqrt(3) 0;1 sqrt(3) 0;0 0 5.45955]'/2;
         b1= [0 0 -4.57; 0 0 -1.92; 0 0 1.92; 0 0 4.57]';
         b2= [0.73 1.26 -3.25; -1.46 0 -3.25; 0.73 -1.26 -3.25; -0.73 -1.26 3.25; 1.46 0 3.25; -0.73 1.26 3.25]';    
-    case('SC')
+    case {'SC'}
         R = [0 0 0]'; b = [0 0 0]';
     case('HCP')
         R = [0 0 0; 1/3 2/3 1/2]'; b = [0 0 0]';
@@ -62,6 +62,7 @@ F = abs(sum(exp(tp*hkl*R),2).*sum(exp(tp*hkl*b),2));
 %F =abs(sum(exp(tp*hkl*R),2).*sum(exp(tp*hkl*b1),2)+sum(exp(tp*hkl*R),2).*sum(exp(tp*hkl*b2),2));
 s2= sum(hkl.^2,2);
 i = find(1e-6 < F); hkl = hkl(i,:); F = F(i); s2 = s2(i);
+
 if strcmp(Struc,'HCP')
     s2 = hkl(:,1).^2 + hkl(:,1).*hkl(:,2) + hkl(:,2).^2;
     %[~,i] = sort(hkl(:,1).^2+hkl(:,2).^2+hkl(:,1).*hkl(:,2)); hkl = hkl(i,:); F = F(i); s2 = s2(i);
