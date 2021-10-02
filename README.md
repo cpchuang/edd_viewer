@@ -6,7 +6,7 @@ Script written in Matlab to visualize Energy-Dispersive X-ray Diffraction (ED-XR
 2. Type "edd_viewer3" in matlab console to start the program.
 
 ## CAUTION:
-__This comes with NO warranty. Use at your own risk.  Report bug/suggestion to cchuang@anl.gov__
+__This comes with NO warranty. Use at your own risk.  Report bug/suggestion to chuang.cp@gmail.com__
 
 ## Acknowledgement:
 Scripts related to peak fitting are modified derivative of Jonathon Almer's code.
