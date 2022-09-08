@@ -1,0 +1,23 @@
+# ignore update script
+update_code.sh
+deploy.sh
+
+# ignore internal README
+README*.txt
+
+# ignore old files
+edd_viewer.m
+edd_viewer2.m
+edd_viewer_r1.m
+edd_viewer_r2.m
+edd_viewer_r3.m
+eddplot.m
+eddplot2.m
+eddplot_aug17.m
+eddplot_mar17.m
+
+
+# ignore matlab project file
+*.prj
+EDD_viewer_resources/
+*.png
