@@ -18,9 +18,11 @@ jobs:
     - name: Install furo theme
       run: |
         pip install furo "pygments >=2.7.0"
-    - name: Install package
-      run: |
-        pip install --no-deps -e .
+
+#    - name: Install package
+#      run: |
+#        pip install --no-deps -e .
+
     - name: Build and Commit
       uses: sphinx-notes/pages@master
       with:
