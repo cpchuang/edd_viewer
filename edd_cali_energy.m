@@ -1,6 +1,8 @@
 function edd_cali_energy(varargin)
 % detector channel to energy calibration
 %
+%   + 1.1.2 2020/07/07
+%           - change inital guess by changing detpar
 %   + 1.1.1  2019/10/23
 %           - select steps to fit
 %   + 1.1.0  2018/08/06
@@ -12,7 +14,7 @@ function edd_cali_energy(varargin)
 %  To-DO: (1) group peaks to fit
 %
 % Copyright 2017-2019 Andrew Chuang
-% $Revision: 1.1.1 $  $Date: 2019/10/23 $
+% $Revision: 1.1.2 $  $Date: 2021/07/07 $
 
 % Check if the panel exist or not
 heddparMain = findall(0,'Tag','eddcaliEnergymain_Fig');
@@ -310,6 +312,7 @@ htablepar(2) = uitable('Parent',heddsetparmain,...
     'Fontsize',13,...
     'RowName',[],...
     'CellSelectionCallback',@uitable2_selection_Callback,...
+    'CellEditCallback',@uitable2_edit_Callback,...
     'Tag','en2ch_table');
 
 
@@ -557,6 +560,19 @@ switch hObject.Value
         fprintf('   energy (keV) = a * ch^2 + b * ch + c\n')
 end
 
+%%%% call back for edit
+function uitable2_edit_Callback(hhobj,eventdata)
+    h = get_handle;
+    
+    % get updated detpar
+    detpar = [hhobj.Data{:}];
+    % get theoratical emission energy
+    emission_eng = [h.par_table.Data{:,1}]';
+    % change expected channel number based on detpar and emission energy
+    h.par_table.Data(:,2) = num2cell((emission_eng-detpar(1))./detpar(2));
+    
+    update_handle(h);
+
 
 %%%% call back to report selection
 function uitable_selection_Callback(~,eventdata)
@@ -567,7 +583,8 @@ function uitable_selection_Callback(~,eventdata)
 function uitable2_selection_Callback(~,eventdata)
     h = get_handle;
     fprintf('select %d\n',eventdata.Indices);
-    %h.opt.table_selection = eventdata.Indices;
+    h.opt.table_selection = eventdata.Indices;
+    eventdata.Source
     update_handle(h);
     
 
