@@ -17,12 +17,12 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'demo_by_AC'
+project = 'EDD_Viewer'
 copyright = '2022, Andrew Chuang'
 author = 'Andrew Chuang'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
