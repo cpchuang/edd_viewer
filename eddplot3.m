@@ -289,23 +289,24 @@ switch lower(type)
                 end
             else
                 ydata = da(scno).fit(phase,pk(i),detno).dspac(x_range);
+                %yerr
             end
             %whos ydata
 
             flag  = find(ydata~=0);
             ydata = ydata(flag);
             if normalize == 1
-                line(xdata(flag),((ydata./mean(ydata))-1)*1E6,'marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
+                line(xdata(flag),((ydata./mean(ydata))-1)*1E6,'linestyle','none','marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
                 %datalim{2} = [-5E3 5E3];
                 ylabel('Strain (x 10^{-6})');
                 %display(sprintf('[%s] = %04.8f, ',num2str(pkname(pk(i),:)),mean(ydata)));
                 fprintf('[%s] = %8.2f %s %8.2f,\n',num2str(pkname(pk(i),:)),mean(((ydata./mean(ydata))-1)*1E6),char(177),std(((ydata./mean(ydata))-1)*1E6));
             elseif normalize == 0
-                line(xdata(flag),ydata,'marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
+                line(xdata(flag),ydata,'linestyle','none','marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
                 ylabel('d-spacing (Angstron)');
                 fprintf('[%s] = %8.8f %s %6.4f,\n',num2str(pkname(pk(i),:)),mean(ydata),char(177),std(ydata));
             else
-                line(xdata(flag),((ydata./dzero(pk(i)))-1)*1E6,'marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
+                line(xdata(flag),((ydata./dzero(pk(i)))-1)*1E6,'linestyle','none','marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
                 %datalim{2} = [-5E3 5E3];
                 ylabel('Strain (x 10^{6})');
                 fprintf('[%s] = %8.2f %s %8.2f,\n',num2str(pkname(pk(i),:)),mean((ydata./dzero(pk(i))-1).*1E6),char(177),std((ydata./dzero(pk(i))-1).*1E6));
@@ -330,19 +331,19 @@ switch lower(type)
             flag  = find(ydata>0 & ydata<20);
             ydata = ydata(flag);
             if normalize == 1
-                line(xdata(flag),((ydata./mean(ydata))-1)*1E6,'marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
+                line(xdata(flag),((ydata./mean(ydata))-1)*1E6,'linestyle','none','marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
                 %datalim{2} = [-5E3 5E3];
                 ylabel('Strain (x 10^{-6})');
                 %display(sprintf('[%s] = %04.8f, ',num2str(pkname(pk(i),:)),mean(ydata)));
                 fprintf('[%s] = %8.2f %s %8.2f, \n',num2str(pkname(pk(i),:)),mean(((ydata./mean(ydata))-1)*1E6),char(177),std(((ydata./mean(ydata))-1)*1E6));
             elseif normalize == 0
-                line(xdata(flag),ydata,'marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
+                line(xdata(flag),ydata,'linestyle','-','marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
                 ylabel('d-spacing (Angstron)');
                 ppfit = polyfit(xdata(flag),ydata,1);
                 fprintf('[%s] = %8.8f %s %6.4f, d_0 = %1.6f\n',num2str(pkname(pk(i),:)),mean(ydata),char(177),std(ydata),ppfit(2));
                 
             else
-                line(xdata(flag),((ydata./dzero(pk(i)))-1)*1E6,'marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
+                line(xdata(flag),((ydata./dzero(pk(i)))-1)*1E6,'linestyle','-','marker','o','color',cc(i,:),'displayname',sprintf('%s',num2str(pkname(pk(i),:))));
                 %datalim{2} = [-5E3 5E3];
                 ylabel('Strain (x 10^{6})');
                 fprintf('[%s] = %8.2f %s %8.2f,\n',num2str(pkname(pk(i),:)),mean((ydata./dzero(pk(i))-1).*1E6),char(177),std((ydata./dzero(pk(i))-1).*1E6));
@@ -361,8 +362,8 @@ switch lower(type)
     case 'int'
         xdata = (da(scno).motorpos+xoffset)*x_scaling;
         for i = 1:length(pk)
-            ydata = da(scno).fit(phase,pk(i)).int;
-            yref  = da(scno).fit(phase,1).int;    % use fitst peak as refernce
+            ydata = da(scno).fit(phase,pk(i),detno).int;
+            yref  = da(scno).fit(phase,1,detno).int;    % use fitst peak as refernce
             flag  = find(ydata~=0);
             ydata = ydata(flag);
             if normalize == 0

@@ -6,11 +6,12 @@ function edd_show_scan_details(varargin)
 %     da[i]: i-th scan struct from readedd5_6bm
 %            default i=1
 %
+% 2021-12-04 : bug fix.
 % 2018-06-05 : add error handling in case motor configuration changes
 % 2018-02-07 : initial release
 %
-% Copyright 2018 Andrew Chuang
-% $Revision: 1.1 $  $Date: 2018/06/05 $
+% Copyright 2018-2021 Andrew Chuang
+% $Revision: 1.1.1 $  $Date: 2021/12/04 $
 
 heddshowscanMain = findall(0,'Tag','eddshowscanmain_Fig');
 if isempty(heddshowscanMain)
@@ -32,21 +33,31 @@ else
             fprintf('Usage: edd_show_scan_details(data_struct)\n')
             return;
     end
+    dval = -999;
     % Error handling
-    if ~isfield(da.allmotors,'s1out'); da.allmotors.s1out = 0 ; end
-    if ~isfield(da.allmotors,'s1in');  da.allmotors.s1in = 0 ; end
-    if ~isfield(da.allmotors,'s1top'); da.allmotors.s1top = 0 ; end
-    if ~isfield(da.allmotors,'s1bot'); da.allmotors.s1bot = 0 ; end
+    if ~isfield(da.allmotors,'s1out'); da.allmotors.s1out = dval; end
+    if ~isfield(da.allmotors,'s1in');  da.allmotors.s1in = dval ; end
+    if ~isfield(da.allmotors,'s1top'); da.allmotors.s1top = dval ; end
+    if ~isfield(da.allmotors,'s1bot'); da.allmotors.s1bot = dval ; end
     
-    if ~isfield(da.allmotors,'s2out'); da.allmotors.s2out = 0 ; end
-    if ~isfield(da.allmotors,'s2in');  da.allmotors.s2in = 0 ; end
-    if ~isfield(da.allmotors,'s2top'); da.allmotors.s2top = 0 ; end
-    if ~isfield(da.allmotors,'s2bot'); da.allmotors.s2bot = 0 ; end
+    if ~isfield(da.allmotors,'s2out'); da.allmotors.s2out = dval ; end
+    if ~isfield(da.allmotors,'s2in');  da.allmotors.s2in = dval ; end
+    if ~isfield(da.allmotors,'s2top'); da.allmotors.s2top = dval ; end
+    if ~isfield(da.allmotors,'s2bot'); da.allmotors.s2bot = dval ; end
     
-    if ~isfield(da.allmotors,'s4hout'); da.allmotors.s4hout = 0 ; end
-    if ~isfield(da.allmotors,'s4hin');  da.allmotors.s4hin = 0 ; end
-    if ~isfield(da.allmotors,'s4htop'); da.allmotors.s4htop = 0 ; end
-    if ~isfield(da.allmotors,'s4hbot'); da.allmotors.s4hbot = 0 ; end
+    if ~isfield(da.allmotors,'s4hout'); da.allmotors.s4hout = dval ; end
+    if ~isfield(da.allmotors,'s4hin');  da.allmotors.s4hin = dval ; end
+    if ~isfield(da.allmotors,'s4htop'); da.allmotors.s4htop = dval ; end
+    if ~isfield(da.allmotors,'s4hbot'); da.allmotors.s4hbot = dval ; end
+
+    if ~isfield(da.allmotors,'s4vout'); da.allmotors.s4vout = dval ; end
+    if ~isfield(da.allmotors,'s4vin');  da.allmotors.s4vin = dval ; end
+    if ~isfield(da.allmotors,'s4vtop'); da.allmotors.s4vtop = dval ; end
+    if ~isfield(da.allmotors,'s4vbot'); da.allmotors.s4vbot = dval ; end
+    
+    if ~isfield(da.allmotors,'vtth'); da.allmotors.vtth = 0 ; end
+    if ~isfield(da.allmotors,'htth'); da.allmotors.htth = 0 ; end
+   
     
     figure(heddshowscanMain);
     h = get_handle;

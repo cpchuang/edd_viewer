@@ -2,6 +2,9 @@
 %  read data into a single Matlab struct
 %  supported configuration: after Feb.2018
 %
+%  Rev.1.93 (2021/07/14)
+%  + add IC0 and IC1 (after sample)
+
 %  Rev.1.92 (2020/01/15)
 %  + support 6bmb 10 element detector. (Adapted from JSP version)
 %
@@ -38,8 +41,8 @@
 %  + to be documented
 %  + read multiple scans from single file (append mode)
 %
-% Copyright 2015-2020 Andrew Chuang (chuang.cp@gmail.com)
-% $Revision: 1.92 $  $Date: 2020/01/15 $
+% Copyright 2015-2021 Andrew Chuang (chuang.cp@gmail.com)
+% $Revision: 1.93 $  $Date: 2021/07/15 $
 
 function [edd]=readedd5_6bm(logtoopen)
 
@@ -50,7 +53,7 @@ if nargin ~= 1
 end
 
 % open and read the file into memory
-if isdir(logtoopen)  % should use "isfolder", but only for R2017b or later
+if isfolder(logtoopen)  % should use "isfolder", but only for R2017b or later
     [~, fname, ~] = fileparts(logtoopen);
     fullname= fullfile(logtoopen,sprintf('%s.xy',fname));
     fid=fopen(fullname);if fid == -1, error('Can''t find/open the input file.'); end
@@ -81,6 +84,7 @@ edd=struct('command',[],...
     'motorstep',[],...
     'exp_time',[],...
     'time_stamp',[],...
+    'ic',[],...
     'log','');
 
 t0 = tic;
@@ -144,6 +148,7 @@ for i = 1:length(ind_command)
             
             %edd(i).log       = snlog(1:lf(3));
             edd(i).log       = snlog(1:lf(1));
+            edd(i).ic        = zeros(nosteps,2);
             edd(i).motorname = mname;
             edd(i).motor_start_end_numstep = [mstart mend numstep];
             edd(i).motorstep = (mend-mstart)/(numstep-1);
@@ -178,6 +183,7 @@ for i = 1:length(ind_command)
             if isempty(exptime); exptime= 0; variable_used = 1; end
             
             edd(i).log       = snlog(1:lf(3));
+            edd(i).ic        = zeros(nosteps,2);
             edd(i).motorname = mname;
             edd(i).motor_start_end_numstep = [mstart mend numstep];
             edd(i).motorstep = (mend-mstart)/numstep;
@@ -211,6 +217,7 @@ for i = 1:length(ind_command)
             if isempty(exptime); exptime= 0; variable_used = 1; end
             
             edd(i).log       = snlog(1:lf(1));
+            edd(i).ic        = zeros(nosteps,2);
             edd(i).motorname = mname;
             edd(i).motor_start_end_numstep = [mstart mend numstep];
             edd(i).motorstep = (mend-mstart)/(numstep-1);
@@ -234,7 +241,7 @@ for i = 1:length(ind_command)
             lf = find(tmpda == newline);         % find line feed
             % header lines
             header_1 = tmpda(1:lf(1)-1);          % <== this is scan# and time stamp in "dddd mmm dd HH:MM:SS yyyy"
-            % header_2 = tmpda(lf(1)+1:lf(2)-1)   % <== this is 2nd line (#at end of scan counts ....)
+            header_2 = tmpda(lf(1)+1:lf(2)-1);    % <== this is 2nd line (#at end of scan counts ....)
             header_3 = tmpda(lf(2)+1:lf(3)-1);    % <== this is selected motor position
             
             % read time_stamp
@@ -243,6 +250,15 @@ for i = 1:length(ind_command)
             edd(i).time_stamp(j) = time_stamp;
             
             separator = find(header_3=='=');
+            
+            % read IC values
+            ic = strsplit(header_2,':');
+            ic = strsplit(ic{2},' ');
+            if length(ic)>6     % old scan doesn't have ic1
+                edd(i).ic(j,:) = [str2num(ic{4}) str2num(ic{7})];
+            else
+                edd(i).ic(j,:) = [str2num(ic{4}) 0];
+            end
             
             % read all motor value
             h3data = str2num(header_3(separator+1:end));

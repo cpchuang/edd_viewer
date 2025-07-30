@@ -59,7 +59,7 @@ switch choice
         opt.detpar = h.config.visopt.Inst.detpar;
         opt.detno = 1;
         opt.source = 1;
-        opt.posno = h.config.visopt.posno;
+        %opt.posno = h.config.visopt.posno;
         opt.mat = 1;
         opt.exp_time = h.data.exp_time;
 

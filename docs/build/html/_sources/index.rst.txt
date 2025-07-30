@@ -8,6 +8,40 @@ Welcome to EDD_Viewer's documentation!
 
 Matlab GUI to visualize Energy-Dispersive X-ray Diffraction (ED-XRD) data collected at 6BM-A at APS.
 
+* This is a bulleted list.
+* It has two items, the second
+  item uses two lines
+
+* this is a list
+
+  * with a nested list
+  * and some subitems
+
+* and here the parent list continues
+
+
+
+1. This is a numbered list.
+2. It has two items too.
+
+
+#. This is a numbered list.
+#. It has two items too.
+
+  #. nested numbered list as well
+  #. nested numbered list item-2
+
+#. continue the parent list
+
+
+This is a code block::
+
+  code-1
+  code-2
+
+  code-3
+
+
 .. note::
 
    This is under development.
